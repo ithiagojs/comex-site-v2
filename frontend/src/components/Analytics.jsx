@@ -76,23 +76,31 @@ const Analytics = ({ auditData, exchangeRate }) => {
         const items = safeData.filter(i => i.category === category);
         if (items.length === 0) return [];
 
-        const totalSell = items.reduce((sum, i) => sum + i.sellPrice, 0);
-        const totalFobBRL = items.reduce((sum, i) => sum + i.fobBRL, 0);
+        // Calcula percentuais para cada produto individualmente
+        let totalFobPercent = 0;
+        let totalTaxPercent = 0;
+        let totalMarginPercent = 0;
 
+        items.forEach(item => {
+            const fobBRL = item.fobValueUSD * rate;
+            const taxMultiplier = category === 'drone' ? 0.73 : 0.78;
+            const taxes = fobBRL * taxMultiplier;
+            const totalCost = fobBRL + taxes;
+
+            // Calcula percentual sobre o preço de venda DESTE produto
+            if (item.sellPrice > 0) {
+                totalFobPercent += (fobBRL / item.sellPrice) * 100;
+                totalTaxPercent += (taxes / item.sellPrice) * 100;
+                totalMarginPercent += ((item.sellPrice - totalCost) / item.sellPrice) * 100;
+            }
+        });
+
+        // Retorna a MÉDIA dos percentuais (não o percentual da média!)
         const count = items.length;
-        const avgSellPrice = totalSell / count;
-        const avgFobBRL = totalFobBRL / count;
-
-        // Usa multiplicador correto para calcular impostos reais
-        const taxMultiplier = category === 'drone' ? 0.73 : 0.78; // Percentual de impostos
-        const taxes = avgFobBRL * taxMultiplier;
-        const totalCost = avgFobBRL + taxes;
-        const margin = avgSellPrice - totalCost;
-
         return [
-            { name: 'Custo China', value: Math.max(0, Number(avgFobBRL.toFixed(2))), color: '#95A5A6' },
-            { name: 'Impostos', value: Math.max(0, Number(taxes.toFixed(2))), color: '#C0392B' },
-            { name: 'Margem Bruta', value: Math.max(0, Number(margin.toFixed(2))), color: '#27AE60' }
+            { name: 'Custo China', value: Math.max(0, Number((totalFobPercent / count).toFixed(2))), color: '#95A5A6' },
+            { name: 'Impostos', value: Math.max(0, Number((totalTaxPercent / count).toFixed(2))), color: '#C0392B' },
+            { name: 'Margem Bruta', value: Math.max(0, Number((totalMarginPercent / count).toFixed(2))), color: '#27AE60' }
         ];
     };
 
