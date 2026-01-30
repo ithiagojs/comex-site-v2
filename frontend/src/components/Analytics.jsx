@@ -106,9 +106,9 @@ const Analytics = ({ auditData, exchangeRate }) => {
 
 
         return [
-            { name: 'Custo China', value: Math.max(0, Number(finalFob.toFixed(2))), color: '#95A5A6' },
-            { name: 'Impostos', value: Math.max(0, Number(finalTax.toFixed(2))), color: '#C0392B' },
-            { name: 'Margem Bruta', value: Math.max(0, Number(finalMargin.toFixed(2))), color: '#27AE60' }
+            { name: 'Custo China', value: Math.max(0, Number(finalFob.toFixed(2))), color: '#d1d5db' },
+            { name: 'Impostos', value: Math.max(0, Number(finalTax.toFixed(2))), color: '#fca5a5' },
+            { name: 'Margem Bruta', value: Math.max(0, Number(finalMargin.toFixed(2))), color: '#86efac' }
         ];
     };
 
@@ -210,8 +210,8 @@ const Analytics = ({ auditData, exchangeRate }) => {
                         <ReferenceLine x={avgFobGlobal} stroke="#6b7280" strokeDasharray="3 3" label="Média FOB" />
                         <ReferenceLine y={avgSellGlobal} stroke="#6b7280" strokeDasharray="3 3" label="Média Venda" />
 
-                        <Scatter name="Drones" data={scatterData.filter(d => d.category === 'drone')} fill="#ef4444" />
-                        <Scatter name="Smartphones" data={scatterData.filter(d => d.category === 'smartphone')} fill="#3b82f6" />
+                        <Scatter name="Drones" data={scatterData.filter(d => d.category === 'drone')} fill="#fca5a5" />
+                        <Scatter name="Smartphones" data={scatterData.filter(d => d.category === 'smartphone')} fill="#93c5fd" />
                     </ScatterChart>
                 </ResponsiveContainer>
             </div>
@@ -378,8 +378,8 @@ const Analytics = ({ auditData, exchangeRate }) => {
                         <YAxis
                             yAxisId="right"
                             orientation="right"
-                            stroke="#F1C40F"
-                            tick={{ fill: '#F1C40F' }}
+                            stroke="#fdba74"
+                            tick={{ fill: '#fdba74' }}
                             domain={[0, 105]}
                             tickFormatter={(value) => `${value}%`}
                         />
@@ -390,8 +390,8 @@ const Analytics = ({ auditData, exchangeRate }) => {
                                     return (
                                         <div style={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '4px', padding: '10px' }}>
                                             <p style={{ color: '#fff', fontWeight: 'bold', marginBottom: '4px' }}>{data.fullName}</p>
-                                            <p style={{ color: '#3b82f6', margin: '2px 0' }}>Faturamento: R$ {formatBRL(data.faturamento)}</p>
-                                            <p style={{ color: '#F1C40F', margin: '2px 0' }}>% Acumulado: {data.percentAcumulado.toFixed(1)}%</p>
+                                            <p style={{ color: '#93c5fd', margin: '2px 0' }}>Faturamento: R$ {formatBRL(data.faturamento)}</p>
+                                            <p style={{ color: '#fdba74', margin: '2px 0' }}>% Acumulado: {data.percentAcumulado.toFixed(1)}%</p>
                                         </div>
                                     );
                                 }
@@ -400,8 +400,8 @@ const Analytics = ({ auditData, exchangeRate }) => {
                         />
                         <Legend
                             payload={[
-                                { value: 'Faturamento (BRL)', type: 'square', color: '#2C3E50' },
-                                { value: '% Acumulado', type: 'line', color: '#F1C40F' }
+                                { value: 'Faturamento (BRL)', type: 'square', color: '#93c5fd' },
+                                { value: '% Acumulado', type: 'line', color: '#fdba74' }
                             ]}
                             verticalAlign="top"
                             height={36}
@@ -429,7 +429,7 @@ const Analytics = ({ auditData, exchangeRate }) => {
                         <Bar
                             yAxisId="left"
                             dataKey="faturamento"
-                            fill="#2C3E50"
+                            fill="#93c5fd"
                             radius={[4, 4, 0, 0]}
                             barSize={50}
                         >
@@ -454,9 +454,9 @@ const Analytics = ({ auditData, exchangeRate }) => {
                             yAxisId="right"
                             type="monotone"
                             dataKey="percentAcumulado"
-                            stroke="#F1C40F"
+                            stroke="#fdba74"
                             strokeWidth={3}
-                            dot={{ fill: '#F1C40F', r: 4 }}
+                            dot={{ fill: '#fdba74', r: 4 }}
                             activeDot={{ r: 6 }}
                         />
                     </ComposedChart>
