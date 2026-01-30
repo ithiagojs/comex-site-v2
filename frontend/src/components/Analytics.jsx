@@ -103,12 +103,7 @@ const Analytics = ({ auditData, exchangeRate }) => {
         const finalTax = totalTaxPercent / count;
         const finalMargin = totalMarginPercent / count;
 
-        console.log(`[DEBUG] ${category} breakdown:`, {
-            fob: finalFob,
-            tax: finalTax,
-            margin: finalMargin,
-            count: count
-        });
+
 
         return [
             { name: 'Custo China', value: Math.max(0, Number(finalFob.toFixed(2))), color: '#95A5A6' },
@@ -311,7 +306,7 @@ const Analytics = ({ auditData, exchangeRate }) => {
             {/* Gráfico 3: Cost Breakdown */}
             <div className="charts-row">
                 <div className="chart-card-half">
-                    <h3 className="chart-title">Composição do Preço (CORRIGIDO) - Drones</h3>
+                    <h3 className="chart-title">Composição do Preço: Quem ganha mais? (Drones)</h3>
                     <ResponsiveContainer width="100%" height={250}>
                         <PieChart>
                             <Pie
