@@ -95,12 +95,25 @@ const Analytics = ({ auditData, exchangeRate }) => {
             }
         });
 
+
         // Retorna a MÉDIA dos percentuais (não o percentual da média!)
         const count = items.length;
+
+        const finalFob = totalFobPercent / count;
+        const finalTax = totalTaxPercent / count;
+        const finalMargin = totalMarginPercent / count;
+
+        console.log(`[DEBUG] ${category} breakdown:`, {
+            fob: finalFob,
+            tax: finalTax,
+            margin: finalMargin,
+            count: count
+        });
+
         return [
-            { name: 'Custo China', value: Math.max(0, Number((totalFobPercent / count).toFixed(2))), color: '#95A5A6' },
-            { name: 'Impostos', value: Math.max(0, Number((totalTaxPercent / count).toFixed(2))), color: '#C0392B' },
-            { name: 'Margem Bruta', value: Math.max(0, Number((totalMarginPercent / count).toFixed(2))), color: '#27AE60' }
+            { name: 'Custo China', value: Math.max(0, Number(finalFob.toFixed(2))), color: '#95A5A6' },
+            { name: 'Impostos', value: Math.max(0, Number(finalTax.toFixed(2))), color: '#C0392B' },
+            { name: 'Margem Bruta', value: Math.max(0, Number(finalMargin.toFixed(2))), color: '#27AE60' }
         ];
     };
 
@@ -298,7 +311,7 @@ const Analytics = ({ auditData, exchangeRate }) => {
             {/* Gráfico 3: Cost Breakdown */}
             <div className="charts-row">
                 <div className="chart-card-half">
-                    <h3 className="chart-title">Composição do Preço: Quem ganha mais? (Drones)</h3>
+                    <h3 className="chart-title">Composição do Preço (CORRIGIDO) - Drones</h3>
                     <ResponsiveContainer width="100%" height={250}>
                         <PieChart>
                             <Pie
