@@ -7,7 +7,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://backend-ebon-psi-69.vercel.app/api/:path*"
+      "destination": "comex-site-v2-m9ftm08ib-thiago-s-projects-9865c398.vercel.app"
     }
   ]
 }
