@@ -1,0 +1,18 @@
+{
+    "name": "comex-io-deploy",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "engines": {
+        "node": "18.x"
+    },
+    "scripts": {
+        "build": "cd frontend && npm install && npm run build"
+    },
+    "dependencies": {
+        "express": "^4.18.2",
+        "cors": "^2.8.5",
+        "axios": "^1.6.5",
+        "json2csv": "^6.0.0-alpha.2"
+    }
+}

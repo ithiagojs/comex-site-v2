@@ -145,11 +145,20 @@ app.get('/', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-    console.log(`\n🚢 Comex.io Backend rodando em http://localhost:${PORT}`);
-    console.log(`📡 APIs disponíveis:`);
-    console.log(`   - GET  /api/exchange-rate`);
-    console.log(`   - GET  /api/products/:category`);
-    console.log(`   - POST /api/calculate-fob`);
-    console.log(`   - POST /api/export-csv\n`);
+    });
 });
+
+// Start server only if run directly (not imported as module for Vercel)
+import { fileURLToPath } from 'url';
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+    app.listen(PORT, () => {
+        console.log(`\n🚢 Comex.io Backend rodando em http://localhost:${PORT}`);
+        console.log(`📡 APIs disponíveis:`);
+        console.log(`   - GET  /api/exchange-rate`);
+        console.log(`   - GET  /api/products/:category`);
+        console.log(`   - POST /api/calculate-fob`);
+        console.log(`   - POST /api/export-csv\n`);
+    });
+}
+
+export default app;

@@ -1,0 +1,89 @@
+﻿
+­ƒôè AN├üLISE DE COMPOSI├ç├âO DE CUSTOS
+
+================================================================================
+
+DRONES
+--------------------------------------------------------------------------------
+
+N├║mero de produtos: 10
+
+M├ëDIAS:
+  Pre├ºo de Venda M├®dio: R$ 37345.10
+  FOB M├®dio (BRL): R$ 6456.28
+  Impostos (73%): R$ 4713.08
+  Custo Total: R$ 11169.36
+  Margem Bruta: R$ 26175.74
+
+PERCENTUAIS (do pre├ºo de venda):
+  Custo China: 17.3%
+  Impostos: 12.6%
+  Margem Bruta: 70.1%
+  TOTAL: 100.0%
+
+EXEMPLOS DE PRODUTOS:
+
+  Drone DJI Tello Boost Combo:
+    Venda: R$ 1699.00
+    FOB: R$ 289.85 (17.1%)
+    Impostos: R$ 211.59 (12.5%)
+    Margem: R$ 1197.56 (70.5%)
+
+  Drone DJI Mini 2 SE:
+    Venda: R$ 3500.00
+    FOB: R$ 606.05 (17.3%)
+    Impostos: R$ 442.42 (12.6%)
+    Margem: R$ 2451.53 (70.0%)
+
+  Drone DJI Mini 4 Pro (Fly More Combo c/ Tela):
+    Venda: R$ 7390.00
+    FOB: R$ 1275.34 (17.3%)
+    Impostos: R$ 931.00 (12.6%)
+    Margem: R$ 5183.66 (70.1%)
+
+SMARTPHONES
+--------------------------------------------------------------------------------
+
+N├║mero de produtos: 10
+
+M├ëDIAS:
+  Pre├ºo de Venda M├®dio: R$ 2940.90
+  FOB M├®dio (BRL): R$ 455.33
+  Impostos (78%): R$ 355.16
+  Custo Total: R$ 810.48
+  Margem Bruta: R$ 2130.42
+
+PERCENTUAIS (do pre├ºo de venda):
+  Custo China: 15.5%
+  Impostos: 12.1%
+  Margem Bruta: 72.4%
+  TOTAL: 100.0%
+
+EXEMPLOS DE PRODUTOS:
+
+  Xiaomi Redmi 13C (256GB):
+    Venda: R$ 880.00
+    FOB: R$ 137.02 (15.6%)
+    Impostos: R$ 106.88 (12.1%)
+    Margem: R$ 636.10 (72.3%)
+
+  Xiaomi Poco M6 Pro:
+    Venda: R$ 1664.00
+    FOB: R$ 258.23 (15.5%)
+    Impostos: R$ 201.42 (12.1%)
+    Margem: R$ 1204.35 (72.4%)
+
+  Xiaomi Redmi Note 14 5G:
+    Venda: R$ 1500.00
+    FOB: R$ 231.88 (15.5%)
+    Impostos: R$ 180.87 (12.1%)
+    Margem: R$ 1087.25 (72.5%)
+
+================================================================================
+­ƒöì CONCLUS├âO:
+================================================================================
+
+O gr├ífico de pizza mostra PERCENTUAIS dos valores absolutos.
+Se a margem em R$ for muito maior que FOB e impostos,
+ela vai dominar o gr├ífico mesmo que o percentual sobre venda seja menor.
+

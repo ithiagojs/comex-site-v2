@@ -1,67 +1,83 @@
 import axios from 'axios';
 
 /**
- * Exchange Service - Integração com APIs Gratuitas
- * Busca cotação do Dólar (USD) para Real (BRL)
+ * Exchange Service - Integração com APIs Gratuitas e Simulação Financeira
+ * Busca cotação USD, EUR, CNY e simula Ações
  */
 
-const API_PROVIDERS = [
-    {
-        name: 'AwesomeAPI',
-        url: 'https://economia.awesomeapi.com.br/json/last/USD-BRL',
-        handler: (data) => ({
-            // Usamos 'ask' (Venda) pois é o valor pago para comprar dólares para importação
-            rate: parseFloat(data.USDBRL.ask),
-            timestamp: new Date(parseInt(data.USDBRL.timestamp) * 1000).toISOString(),
-            source: 'AwesomeAPI'
-        })
-    },
-    {
-        name: 'OpenEra',
-        url: 'https://open.er-api.com/v6/latest/USD',
-        handler: (data) => ({
-            rate: data.rates.BRL,
-            timestamp: new Date(data.time_last_update_unix * 1000).toISOString(),
-            source: 'OpenEra API'
-        })
-    }
+const AWESOME_API_URL = 'https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,CNY-BRL';
+
+const FALLBACK_RATES = {
+    USD: 5.80,
+    EUR: 6.20,
+    CNY: 0.80
+};
+
+// Mock de Ações (Valores aproximados em USD)
+const STOCKS = [
+    { symbol: 'MELI', name: 'Mercado Livre', price: 1500.00 },
+    { symbol: 'SE', name: 'Shopee', price: 40.00 },
+    { symbol: 'BABA', name: 'Alibaba', price: 75.00 },
+    { symbol: 'AMZN', name: 'Amazon', price: 170.00 }
 ];
 
-const FALLBACK_RATE = 5.80; // Atualizado para um valor mais realista de mercado (margem de segurança)
+function generateRandomVariation(basePrice) {
+    const variation = (Math.random() - 0.5) * 4; // +/- 2%
+    return {
+        price: (basePrice * (1 + variation / 100)).toFixed(2),
+        variation: variation.toFixed(2)
+    };
+}
 
 export async function getExchangeRate() {
-    // Tenta cada provedor em ordem
-    for (const provider of API_PROVIDERS) {
-        try {
-            console.log(`Trying fetching rate from ${provider.name}...`);
-            const response = await axios.get(provider.url, { timeout: 5000 });
+    let currencies = {};
 
-            const result = provider.handler(response.data);
+    // 1. Fetch Currencies
+    try {
+        console.log(`Fetching multicurrency rates from AwesomeAPI...`);
+        const response = await axios.get(AWESOME_API_URL, { timeout: 5000 });
+        const data = response.data;
 
-            // Validação básica
-            if (!result.rate || isNaN(result.rate)) {
-                throw new Error('Invalid rate data');
+        currencies = {
+            USD: {
+                rate: parseFloat(data.USDBRL.ask),
+                variation: parseFloat(data.USDBRL.pctChange)
+            },
+            EUR: {
+                rate: parseFloat(data.EURBRL.ask),
+                variation: parseFloat(data.EURBRL.pctChange)
+            },
+            CNY: {
+                rate: parseFloat(data.CNYBRL.ask),
+                variation: parseFloat(data.CNYBRL.pctChange)
             }
-
-            return {
-                ...result,
-                low: result.rate * 0.99,
-                high: result.rate * 1.01
-            };
-        } catch (error) {
-            console.warn(`Failed to fetch from ${provider.name}:`, error.message);
-            // Continua para o próximo provedor
-        }
+        };
+    } catch (error) {
+        console.warn('Failed to fetch currencies:', error.message);
+        // Fallback
+        currencies = {
+            USD: { rate: FALLBACK_RATES.USD, variation: 0 },
+            EUR: { rate: FALLBACK_RATES.EUR, variation: 0 },
+            CNY: { rate: FALLBACK_RATES.CNY, variation: 0 }
+        };
     }
 
-    // Se todos falharem
-    console.warn('All APIs failed. Using fallback rate.');
+    // 2. Generate Mock Stocks
+    const stocks = STOCKS.map(stock => {
+        const data = generateRandomVariation(stock.price);
+        return {
+            symbol: stock.symbol,
+            name: stock.name,
+            price: data.price,
+            variation: data.variation
+        };
+    });
+
     return {
-        rate: FALLBACK_RATE,
+        rate: currencies.USD.rate, // Maintain backward compatibility for calculations
+        currencies,
+        stocks,
         timestamp: new Date().toISOString(),
-        source: 'Fallback (System)',
-        high: FALLBACK_RATE,
-        low: FALLBACK_RATE,
-        error: 'Service Unavailable'
+        source: 'AwesomeAPI + MockData'
     };
 }

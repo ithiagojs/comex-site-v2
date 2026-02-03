@@ -4,6 +4,9 @@ import './TabStyles.css';
 
 import { api } from './services/api';
 import Analytics from './components/Analytics';
+import MarketTicker from './components/MarketTicker';
+import { ThemeProvider } from './context/ThemeContext';
+import ThemeToggle from './components/ThemeToggle';
 import { formatBRL, formatUSD, formatWeight } from './utils/formatters';
 
 function App() {
@@ -84,162 +87,172 @@ function App() {
 
 
     return (
-        <div className="app">
-            {/* Header */}
-            <header className="header">
-                <h1>🚢 Comex.io</h1>
-                <p className="subtitle">Import Hunter</p>
+        <ThemeProvider>
+            <div className="app">
+                <ThemeToggle />
+                {/* Header */}
+                <header className="header">
+                    <h1>🚢 Comex.io</h1>
+                    <p className="subtitle">Import Hunter</p>
 
-                {exchangeRate && (
-                    <div className="exchange-badge">
-                        <span className="label">Cotação USD:</span>
-                        <span className="value">R$ {formatBRL(exchangeRate.rate)}</span>
-                    </div>
-                )}
-            </header>
+                    {exchangeRate && <MarketTicker data={exchangeRate} />}
+                </header>
 
-            {/* Tab Navigation */}
-            <div className="tab-navigation">
-                <button
-                    className={`tab-btn ${activeTab === 'products' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('products')}
-                >
-                    📦 Produtos
-                </button>
-                <button
-                    className={`tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('analytics')}
-                >
-                    📊 Analytics
-                </button>
-            </div>
+                {/* Tab Navigation */}
+                <div className="tab-navigation">
+                    <button
+                        className={`tab-btn ${activeTab === 'products' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('products')}
+                    >
+                        📦 Produtos
+                    </button>
+                    <button
+                        className={`tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('analytics')}
+                    >
+                        📊 Analytics
+                    </button>
+                </div>
 
-            {/* Products Tab */}
-            {activeTab === 'products' && (
-                <>
-                    {/* Category Selector */}
-                    <div className="category-selector">
-                        <button
-                            className={`category-btn ${selectedCategory === 'drone' ? 'active' : ''}`}
-                            onClick={() => setSelectedCategory('drone')}
-                        >
-                            🛸 Drones
-                        </button>
-                        <button
-                            className={`category-btn ${selectedCategory === 'smartphone' ? 'active' : ''}`}
-                            onClick={() => setSelectedCategory('smartphone')}
-                        >
-                            📱 Smartphones
-                        </button>
-                    </div>
+                {/* Products Tab */}
+                {activeTab === 'products' && (
+                    <>
+                        {/* Category Selector */}
+                        <div className="category-selector">
+                            <button
+                                className={`category-btn ${selectedCategory === 'drone' ? 'active' : ''}`}
+                                onClick={() => setSelectedCategory('drone')}
+                            >
+                                🛸 Drones
+                            </button>
+                            <button
+                                className={`category-btn ${selectedCategory === 'smartphone' ? 'active' : ''}`}
+                                onClick={() => setSelectedCategory('smartphone')}
+                            >
+                                📱 Smartphones
+                            </button>
+                        </div>
 
-                    {/* Products Section */}
-                    <section className="products-section">
-                        <h2 className="section-title">
-                            Produtos Disponíveis ({selectedCategory === 'drone' ? 'Drones' : 'Smartphones'})
-                        </h2>
+                        {/* Products Section */}
+                        <section className="products-section">
+                            <h2 className="section-title">
+                                Produtos Disponíveis ({selectedCategory === 'drone' ? 'Drones' : 'Smartphones'})
+                            </h2>
 
-                        {loading ? (
-                            <div className="loading">Carregando produtos...</div>
-                        ) : (
-                            <div className="products-grid">
-                                {products.map(product => (
-                                    <div key={product.id} className="product-card">
-                                        <div className="product-image">
-                                            {product.title.split(' ').slice(0, 3).join(' ')}
-                                        </div>
-                                        <div className="product-info">
-                                            <h3 className="product-title">{product.title}</h3>
-                                            <p className="product-price">
-                                                {product.currency === 'USD' && exchangeRate
-                                                    ? `R$ ${formatBRL(product.price * exchangeRate.rate)}`
-                                                    : `R$ ${formatBRL(product.price)}`
-                                                }
-                                            </p>
-                                            <button
-                                                className="analyze-btn"
-                                                onClick={() => handleAnalyzeProduct(product)}
+                            {loading ? (
+                                <div className="loading">Carregando produtos...</div>
+                            ) : (
+                                <div className="products-grid">
+                                    {products.map(product => {
+                                        const isSelected = auditData.some(item => item.id === product.id);
+                                        return (
+                                            <div
+                                                key={product.id}
+                                                className={`product-card ${isSelected ? 'selected' : ''}`}
                                             >
-                                                🔍 Analisar Importação
-                                            </button>
-                                        </div>
+                                                <div className="product-image">
+                                                    {product.title.split(' ').slice(0, 3).join(' ')}
+                                                    {product.description && (
+                                                        <div className="product-overlay">
+                                                            <p>{product.description}</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="product-info">
+                                                    <h3 className="product-title">{product.title}</h3>
+                                                    <p className="product-price">
+                                                        {product.currency === 'USD' && exchangeRate
+                                                            ? `R$ ${formatBRL(product.price * exchangeRate.rate)}`
+                                                            : `R$ ${formatBRL(product.price)}`
+                                                        }
+                                                    </p>
+                                                    <button
+                                                        className={`analyze-btn ${isSelected ? 'selected' : ''}`}
+                                                        onClick={() => isSelected ? handleRemoveAuditItem(product.id) : handleAnalyzeProduct(product)}
+                                                    >
+                                                        {isSelected ? '✓ Selecionado' : '🔍 Analisar Importação'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </section>
+
+                        {/* Audit Table */}
+                        {auditData.length > 0 && (
+                            <section className="audit-section">
+                                <h2 className="section-title">📋 Tabela de Auditoria - Análise FOB</h2>
+
+                                <div className="audit-container">
+                                    <div className="table-wrapper">
+                                        <table className="audit-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Produto</th>
+                                                    <th>NCM</th>
+                                                    <th>Preço Venda (BRL)</th>
+                                                    <th>Valor FOB (USD)</th>
+                                                    <th>Peso (kg)</th>
+                                                    <th>Porto</th>
+                                                    <th>País</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {auditData.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{item.title}</td>
+                                                        <td>{item.ncmCode}</td>
+                                                        <td>R$ {formatBRL(item.sellPrice)}</td>
+                                                        <td style={{ color: '#10b981', fontWeight: '600' }}>
+                                                            $ {formatUSD(item.fobValueUSD)}
+                                                        </td>
+                                                        <td>{formatWeight(item.estimatedWeight)}</td>
+                                                        <td>SANTOS</td>
+                                                        <td>CHINA</td>
+                                                        <td>
+                                                            <button
+                                                                className="remove-btn"
+                                                                onClick={() => handleRemoveAuditItem(item.id)}
+                                                                title="Remover item"
+                                                            >
+                                                                ✕
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
                                     </div>
-                                ))}
+
+                                    <button className="export-btn" onClick={handleExportCSV}>
+                                        📥 Exportar CSV para Siscomex
+                                    </button>
+                                </div>
+                            </section>
+                        )}
+
+                        {auditData.length === 0 && !loading && (
+                            <div className="empty-state">
+                                <div className="empty-state-icon">📊</div>
+                                <p>Selecione produtos acima e clique em "Analisar Importação" para ver os cálculos detalhados</p>
                             </div>
                         )}
-                    </section>
+                    </>
+                )}
 
-                    {/* Audit Table */}
-                    {auditData.length > 0 && (
-                        <section className="audit-section">
-                            <h2 className="section-title">📋 Tabela de Auditoria - Análise FOB</h2>
+                {/* Analytics Tab */}
+                {activeTab === 'analytics' && (
+                    <Analytics
+                        auditData={auditData}
+                        exchangeRate={exchangeRate}
+                    />
+                )}
 
-                            <div className="audit-container">
-                                <div className="table-wrapper">
-                                    <table className="audit-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Produto</th>
-                                                <th>NCM</th>
-                                                <th>Preço Venda (BRL)</th>
-                                                <th>Valor FOB (USD)</th>
-                                                <th>Peso (kg)</th>
-                                                <th>Porto</th>
-                                                <th>País</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {auditData.map((item, index) => (
-                                                <tr key={index}>
-                                                    <td>{item.title}</td>
-                                                    <td>{item.ncmCode}</td>
-                                                    <td>R$ {formatBRL(item.sellPrice)}</td>
-                                                    <td style={{ color: '#10b981', fontWeight: '600' }}>
-                                                        $ {formatUSD(item.fobValueUSD)}
-                                                    </td>
-                                                    <td>{formatWeight(item.estimatedWeight)}</td>
-                                                    <td>SANTOS</td>
-                                                    <td>CHINA</td>
-                                                    <td>
-                                                        <button
-                                                            className="remove-btn"
-                                                            onClick={() => handleRemoveAuditItem(item.id)}
-                                                            title="Remover item"
-                                                        >
-                                                            ✕
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <button className="export-btn" onClick={handleExportCSV}>
-                                    📥 Exportar CSV para Siscomex
-                                </button>
-                            </div>
-                        </section>
-                    )}
-
-                    {auditData.length === 0 && !loading && (
-                        <div className="empty-state">
-                            <div className="empty-state-icon">📊</div>
-                            <p>Selecione produtos acima e clique em "Analisar Importação" para ver os cálculos detalhados</p>
-                        </div>
-                    )}
-                </>
-            )}
-
-            {/* Analytics Tab */}
-            {activeTab === 'analytics' && (
-                <Analytics
-                    auditData={auditData}
-                    exchangeRate={exchangeRate}
-                />
-            )}
-        </div>
+            </div>
+        </ThemeProvider>
     );
 }
 

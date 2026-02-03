@@ -6,31 +6,8 @@ import {
 } from 'recharts';
 import './Analytics.css';
 import { formatBRL, formatUSD, formatWeight, formatPercent, formatNumber } from '../utils/formatters';
-import { useTheme } from '../context/ThemeContext';
 
 const Analytics = ({ auditData, exchangeRate }) => {
-    const { theme } = useTheme();
-
-    // Define colors based on theme
-    const isDark = theme === 'dark';
-    const chartTheme = {
-        text: isDark ? '#9ca3af' : '#334155', // Slate-700 for light
-        textHighlight: isDark ? '#ffffff' : '#0f172a', // Slate-900 for light
-        grid: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.1)',
-        axis: isDark ? '#9ca3af' : '#64748b', // Slate-500
-        tooltipBg: isDark ? '#1f2937' : '#ffffff',
-        tooltipBorder: isDark ? '#374151' : '#cbd5e1',
-        tooltipText: isDark ? '#f3f4f6' : '#1e293b',
-        legendText: isDark ? '#e5e7eb' : '#334155',
-        droneColor: isDark ? '#FFB74D' : '#d97706', // Amber-300 vs Amber-600
-        phoneColor: isDark ? '#8AB4F8' : '#2563eb', // Blue-300 vs Blue-600
-        referenceLine: isDark ? '#10b981' : '#059669',
-        referenceText: isDark ? '#10b981' : '#059669',
-        barLabel: isDark ? '#ffffff' : '#1e293b',
-        paretoBar: isDark ? '#93c5fd' : '#3b82f6', // Blue-300 vs Blue-500
-        paretoLine: isDark ? '#fdba74' : '#f59e0b', // Orange-300 vs Amber-500
-    };
-
     // Fail-safe for missing data
     if (!auditData || auditData.length === 0) {
         return (
@@ -99,39 +76,23 @@ const Analytics = ({ auditData, exchangeRate }) => {
         const items = safeData.filter(i => i.category === category);
         if (items.length === 0) return [];
 
-        // Calcula percentuais para cada produto individualmente
-        let totalFobPercent = 0;
-        let totalTaxPercent = 0;
-        let totalMarginPercent = 0;
+        const totalSell = items.reduce((sum, i) => sum + i.sellPrice, 0);
+        const totalFobBRL = items.reduce((sum, i) => sum + i.fobBRL, 0);
 
-        items.forEach(item => {
-            const fobBRL = item.fobValueUSD * rate;
-            const taxMultiplier = category === 'drone' ? 0.73 : 0.78;
-            const taxes = fobBRL * taxMultiplier;
-            const totalCost = fobBRL + taxes;
-
-            // Calcula percentual sobre o preço de venda DESTE produto
-            if (item.sellPrice > 0) {
-                totalFobPercent += (fobBRL / item.sellPrice) * 100;
-                totalTaxPercent += (taxes / item.sellPrice) * 100;
-                totalMarginPercent += ((item.sellPrice - totalCost) / item.sellPrice) * 100;
-            }
-        });
-
-
-        // Retorna a MÉDIA dos percentuais (não o percentual da média!)
         const count = items.length;
+        const avgSellPrice = totalSell / count;
+        const avgFobBRL = totalFobBRL / count;
 
-        const finalFob = totalFobPercent / count;
-        const finalTax = totalTaxPercent / count;
-        const finalMargin = totalMarginPercent / count;
-
-
+        // Usa multiplicador correto para calcular impostos reais
+        const taxMultiplier = category === 'drone' ? 0.73 : 0.78; // Percentual de impostos
+        const taxes = avgFobBRL * taxMultiplier;
+        const totalCost = avgFobBRL + taxes;
+        const margin = avgSellPrice - totalCost;
 
         return [
-            { name: 'Custo China', value: Math.max(0, Number(finalFob.toFixed(2))), color: isDark ? '#d1d5db' : '#94a3b8' },
-            { name: 'Impostos', value: Math.max(0, Number(finalTax.toFixed(2))), color: isDark ? '#fca5a5' : '#ef4444' },
-            { name: 'Margem Bruta', value: Math.max(0, Number(finalMargin.toFixed(2))), color: isDark ? '#86efac' : '#22c55e' }
+            { name: 'Custo China', value: Math.max(0, Number(avgFobBRL.toFixed(2))), color: '#95A5A6' },
+            { name: 'Impostos', value: Math.max(0, Number(taxes.toFixed(2))), color: '#C0392B' },
+            { name: 'Margem Bruta', value: Math.max(0, Number(margin.toFixed(2))), color: '#27AE60' }
         ];
     };
 
@@ -223,21 +184,18 @@ const Analytics = ({ auditData, exchangeRate }) => {
                 <p className="chart-subtitle">Custo FOB (Risco de Capital) × Preço de Venda (Retorno)</p>
                 <ResponsiveContainer width="100%" height={300}>
                     <ScatterChart margin={{ top: 30, right: 30, bottom: 30, left: 40 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
-                        <XAxis type="number" dataKey="fobUSD" name="FOB" unit=" USD" stroke={chartTheme.axis} tick={{ fill: chartTheme.axis }} />
-                        <YAxis type="number" dataKey="sellPrice" name="Venda" unit=" BRL" stroke={chartTheme.axis} tick={{ fill: chartTheme.axis }} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3e" />
+                        <XAxis type="number" dataKey="fobUSD" name="FOB" unit=" USD" stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
+                        <YAxis type="number" dataKey="sellPrice" name="Venda" unit=" BRL" stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
                         <ZAxis type="number" dataKey="weight" range={[100, 150]} name="Peso (kg)" />
-                        <Tooltip cursor={{ strokeDasharray: '3 3' }}
-                            contentStyle={{ backgroundColor: chartTheme.tooltipBg, borderColor: chartTheme.tooltipBorder, color: chartTheme.tooltipText }}
-                            itemStyle={{ color: chartTheme.tooltipText }}
-                        />
-                        <Legend verticalAlign="top" height={36} wrapperStyle={{ color: chartTheme.legendText }} />
+                        <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                        <Legend verticalAlign="top" height={36} />
 
-                        <ReferenceLine x={avgFobGlobal} stroke={chartTheme.axis} strokeDasharray="3 3" label={{ value: "Média FOB", fill: chartTheme.text }} />
-                        <ReferenceLine y={avgSellGlobal} stroke={chartTheme.axis} strokeDasharray="3 3" label={{ value: "Média Venda", fill: chartTheme.text }} />
+                        <ReferenceLine x={avgFobGlobal} stroke="#6b7280" strokeDasharray="3 3" label="Média FOB" />
+                        <ReferenceLine y={avgSellGlobal} stroke="#6b7280" strokeDasharray="3 3" label="Média Venda" />
 
-                        <Scatter name="Drones" data={scatterData.filter(d => d.category === 'drone')} fill={chartTheme.droneColor} />
-                        <Scatter name="Smartphones" data={scatterData.filter(d => d.category === 'smartphone')} fill={chartTheme.phoneColor} />
+                        <Scatter name="Drones" data={scatterData.filter(d => d.category === 'drone')} fill="#ef4444" />
+                        <Scatter name="Smartphones" data={scatterData.filter(d => d.category === 'smartphone')} fill="#3b82f6" />
                     </ScatterChart>
                 </ResponsiveContainer>
             </div>
@@ -248,23 +206,23 @@ const Analytics = ({ auditData, exchangeRate }) => {
                 <p className="chart-subtitle">Valor Agregado por Kg (Quanto maior, mais viável o frete Aéreo)</p>
                 <ResponsiveContainer width="100%" height={600}>
                     <BarChart data={densityData} layout="vertical" margin={{ top: 20, right: 80, left: 20, bottom: 20 }}>
-                        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={chartTheme.grid} />
+                        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(255,255,255,0.05)" />
                         <XAxis
                             type="number"
-                            stroke={chartTheme.axis}
+                            stroke="#9ca3af"
                             tick={false}
                             axisLine={false}
                             domain={[0, dataMax => Math.max(dataMax, 4000)]}
                         />
-                        <YAxis dataKey="name" type="category" stroke={chartTheme.axis} width={120} tick={{ fontSize: 11, fill: chartTheme.text }} />
+                        <YAxis dataKey="name" type="category" stroke="#9ca3af" width={120} tick={{ fontSize: 11 }} />
                         <Tooltip
-                            cursor={{ fill: chartTheme.grid }}
+                            cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
                             content={({ active, payload, label }) => {
                                 if (active && payload && payload.length) {
                                     return (
-                                        <div className="custom-tooltip" style={{ backgroundColor: chartTheme.tooltipBg, border: `1px solid ${chartTheme.tooltipBorder}`, borderRadius: '4px', padding: '10px' }}>
-                                            <p className="label" style={{ color: chartTheme.tooltipText, fontWeight: 'bold', marginBottom: '4px' }}>{label}</p>
-                                            <p className="value" style={{ color: chartTheme.text, margin: 0 }}>
+                                        <div className="custom-tooltip" style={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '4px', padding: '10px' }}>
+                                            <p className="label" style={{ color: '#fff', fontWeight: 'bold', marginBottom: '4px' }}>{label}</p>
+                                            <p className="value" style={{ color: '#f3f4f6', margin: 0 }}>
                                                 {`R$ ${formatBRL(Number(payload[0].value))}/kg`}
                                             </p>
                                         </div>
@@ -275,16 +233,16 @@ const Analytics = ({ auditData, exchangeRate }) => {
                         />
                         <Legend
                             payload={[
-                                { value: 'Drones', type: 'square', id: 'ID01', color: chartTheme.droneColor },
-                                { value: 'Smartphones', type: 'square', id: 'ID02', color: chartTheme.phoneColor }
+                                { value: 'Drones', type: 'square', id: 'ID01', color: '#FFB74D' },
+                                { value: 'Smartphones', type: 'square', id: 'ID02', color: '#8AB4F8' }
                             ]}
                             verticalAlign="top"
                             height={36}
-                            wrapperStyle={{ color: chartTheme.legendText, fontSize: '12px', paddingBottom: '10px' }}
+                            wrapperStyle={{ color: '#e5e7eb', fontSize: '12px', paddingBottom: '10px' }}
                         />
                         <ReferenceLine
                             x={3000}
-                            stroke={chartTheme.referenceLine}
+                            stroke="#10b981"
                             strokeDasharray="5 5"
                             strokeWidth={2}
                             isFront={true}
@@ -292,7 +250,7 @@ const Analytics = ({ auditData, exchangeRate }) => {
                             <Label
                                 value="Zona Aérea ✈️"
                                 position="insideTopRight"
-                                fill={chartTheme.referenceText}
+                                fill="#10b981"
                                 fontSize={12}
                                 fontWeight={600}
                                 dy={-10}
@@ -308,12 +266,12 @@ const Analytics = ({ auditData, exchangeRate }) => {
                         </ReferenceLine>
                         <Bar dataKey="density" radius={[0, 4, 4, 0]} barSize={20} legendType="none">
                             {densityData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.category === 'drone' ? chartTheme.droneColor : chartTheme.phoneColor} />
+                                <Cell key={`cell-${index}`} fill={entry.category === 'drone' ? '#FFB74D' : '#8AB4F8'} />
                             ))}
                             <LabelList
                                 dataKey="density"
                                 position="right"
-                                fill={chartTheme.barLabel}
+                                fill="#ffffff"
                                 fontSize={12}
                                 fontWeight={600}
                                 formatter={(val) => {
@@ -347,8 +305,8 @@ const Analytics = ({ auditData, exchangeRate }) => {
                             >
                                 {droneCosts.map((entry, index) => <Cell key={index} fill={entry.color} />)}
                             </Pie>
-                            <text x="50%" y="50%" dy={8} textAnchor="middle" fill={chartTheme.textHighlight} fontSize={32}>🛸</text>
-                            <Tooltip contentStyle={{ backgroundColor: chartTheme.tooltipBg, borderColor: chartTheme.tooltipBorder, color: chartTheme.tooltipText }} />
+                            <text x="50%" y="50%" dy={8} textAnchor="middle" fill="#e5e7eb" fontSize={32}>🛸</text>
+                            <Tooltip />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
@@ -368,8 +326,8 @@ const Analytics = ({ auditData, exchangeRate }) => {
                             >
                                 {phoneCosts.map((entry, index) => <Cell key={index} fill={entry.color} />)}
                             </Pie>
-                            <text x="50%" y="50%" dy={8} textAnchor="middle" fill={chartTheme.textHighlight} fontSize={32}>📱</text>
-                            <Tooltip contentStyle={{ backgroundColor: chartTheme.tooltipBg, borderColor: chartTheme.tooltipBorder, color: chartTheme.tooltipText }} />
+                            <text x="50%" y="50%" dy={8} textAnchor="middle" fill="#e5e7eb" fontSize={32}>📱</text>
+                            <Tooltip />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
@@ -381,19 +339,19 @@ const Analytics = ({ auditData, exchangeRate }) => {
                 <p className="chart-subtitle">Lei de Pareto: Top 12 Produtos por Receita (Barras) + % Acumulado (Linha)</p>
                 <ResponsiveContainer width="100%" height={350}>
                     <ComposedChart data={paretoData} margin={{ top: 20, right: 60, left: 20, bottom: 60 }} barGap={0.2}>
-                        <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                         <XAxis
                             dataKey="name"
-                            stroke={chartTheme.axis}
-                            tick={{ fill: chartTheme.axis, fontSize: 10 }}
+                            stroke="#9ca3af"
+                            tick={{ fill: '#e5e7eb', fontSize: 10 }}
                             angle={-35}
                             textAnchor="end"
                             height={60}
                         />
                         <YAxis
                             yAxisId="left"
-                            stroke={chartTheme.axis}
-                            tick={{ fill: chartTheme.axis }}
+                            stroke="#9ca3af"
+                            tick={{ fill: '#9ca3af' }}
                             tickFormatter={(value) => {
                                 if (value >= 1000) {
                                     return `R$ ${(value / 1000).toFixed(0)}k`;
@@ -404,8 +362,8 @@ const Analytics = ({ auditData, exchangeRate }) => {
                         <YAxis
                             yAxisId="right"
                             orientation="right"
-                            stroke={chartTheme.paretoLine}
-                            tick={{ fill: chartTheme.paretoLine }}
+                            stroke="#F1C40F"
+                            tick={{ fill: '#F1C40F' }}
                             domain={[0, 105]}
                             tickFormatter={(value) => `${value}%`}
                         />
@@ -414,10 +372,10 @@ const Analytics = ({ auditData, exchangeRate }) => {
                                 if (active && payload && payload.length) {
                                     const data = payload[0].payload;
                                     return (
-                                        <div style={{ backgroundColor: chartTheme.tooltipBg, border: `1px solid ${chartTheme.tooltipBorder}`, borderRadius: '4px', padding: '10px' }}>
-                                            <p style={{ color: chartTheme.tooltipText, fontWeight: 'bold', marginBottom: '4px' }}>{data.fullName}</p>
-                                            <p style={{ color: chartTheme.paretoBar, margin: '2px 0' }}>Faturamento: R$ {formatBRL(data.faturamento)}</p>
-                                            <p style={{ color: chartTheme.paretoLine, margin: '2px 0' }}>% Acumulado: {data.percentAcumulado.toFixed(1)}%</p>
+                                        <div style={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '4px', padding: '10px' }}>
+                                            <p style={{ color: '#fff', fontWeight: 'bold', marginBottom: '4px' }}>{data.fullName}</p>
+                                            <p style={{ color: '#3b82f6', margin: '2px 0' }}>Faturamento: R$ {formatBRL(data.faturamento)}</p>
+                                            <p style={{ color: '#F1C40F', margin: '2px 0' }}>% Acumulado: {data.percentAcumulado.toFixed(1)}%</p>
                                         </div>
                                     );
                                 }
@@ -426,12 +384,12 @@ const Analytics = ({ auditData, exchangeRate }) => {
                         />
                         <Legend
                             payload={[
-                                { value: 'Faturamento (BRL)', type: 'square', color: chartTheme.paretoBar },
-                                { value: '% Acumulado', type: 'line', color: chartTheme.paretoLine }
+                                { value: 'Faturamento (BRL)', type: 'square', color: '#2C3E50' },
+                                { value: '% Acumulado', type: 'line', color: '#F1C40F' }
                             ]}
                             verticalAlign="top"
                             height={36}
-                            wrapperStyle={{ color: chartTheme.legendText, fontWeight: 'bold' }}
+                            wrapperStyle={{ color: '#ffffff', fontWeight: 'bold' }}
                         />
 
                         {/* Linha de corte 80% - Classe A */}
@@ -455,14 +413,14 @@ const Analytics = ({ auditData, exchangeRate }) => {
                         <Bar
                             yAxisId="left"
                             dataKey="faturamento"
-                            fill={chartTheme.paretoBar}
+                            fill="#2C3E50"
                             radius={[4, 4, 0, 0]}
                             barSize={50}
                         >
                             <LabelList
                                 dataKey="faturamento"
                                 position="top"
-                                fill={chartTheme.barLabel}
+                                fill="#ffffff"
                                 fontSize={11}
                                 fontWeight="bold"
                                 formatter={(val) => {
@@ -480,9 +438,9 @@ const Analytics = ({ auditData, exchangeRate }) => {
                             yAxisId="right"
                             type="monotone"
                             dataKey="percentAcumulado"
-                            stroke={chartTheme.paretoLine}
+                            stroke="#F1C40F"
                             strokeWidth={3}
-                            dot={{ fill: chartTheme.paretoLine, r: 4 }}
+                            dot={{ fill: '#F1C40F', r: 4 }}
                             activeDot={{ r: 6 }}
                         />
                     </ComposedChart>
