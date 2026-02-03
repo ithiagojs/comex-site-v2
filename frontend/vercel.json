@@ -7,7 +7,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "comex-site-v2-m9ftm08ib-thiago-s-projects-9865c398.vercel.app"
+      "destination": "https://comex-site-v2-m9ftm08ib-thiago-s-projects-9865c398.vercel.app"
     }
   ]
 }
