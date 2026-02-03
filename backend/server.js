@@ -145,8 +145,7 @@ app.get('/', (req, res) => {
 });
 
 // Start server
-    });
-});
+
 
 // Start server only if run directly (not imported as module for Vercel)
 import { fileURLToPath } from 'url';
