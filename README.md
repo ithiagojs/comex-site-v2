@@ -88,4 +88,4 @@ MIT
 
 ---
 
-Desenvolvido com ❤️ para otimização de processos de importação
+Desenvolvido Thiago J. e Karina M. para otimização de processos de importação
