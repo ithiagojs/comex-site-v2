@@ -13,12 +13,12 @@ const FALLBACK_RATES = {
     CNY: 0.80
 };
 
-// Mock de Ações (Valores aproximados em USD)
+// Mock de Ações (Valores aproximados em USD - Fev/2026)
 const STOCKS = [
-    { symbol: 'MELI', name: 'Mercado Livre', price: 1500.00 },
-    { symbol: 'SE', name: 'Shopee', price: 40.00 },
-    { symbol: 'BABA', name: 'Alibaba', price: 75.00 },
-    { symbol: 'AMZN', name: 'Amazon', price: 170.00 }
+    { symbol: 'MELI', name: 'Mercado Livre', price: 2058.60 },
+    { symbol: 'SE', name: 'Shopee', price: 106.26 },
+    { symbol: 'BABA', name: 'Alibaba', price: 159.14 },
+    { symbol: 'AMZN', name: 'Amazon', price: 232.99 }
 ];
 
 function generateRandomVariation(basePrice) {

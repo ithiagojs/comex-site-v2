@@ -1,0 +1,101 @@
+.social-widget-container {
+    position: fixed;
+    top: 1.5rem;
+    left: 1.5rem;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.social-toggle {
+    background: #0077b5;
+    /* LinkedIn Brand Color */
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 119, 181, 0.3);
+    z-index: 1002;
+    /* Acima do backdrop */
+}
+
+.social-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 20px rgba(0, 119, 181, 0.5);
+}
+
+.social-toggle.active {
+    transform: scale(1.1);
+}
+
+.linkedin-logo {
+    width: 20px;
+    height: 20px;
+}
+
+.social-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.75rem;
+    background: #0f172a;
+    /* Fundo escuro sólido para contraste */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 140px;
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 1002;
+}
+
+.social-dropdown.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+}
+
+.social-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: #f8fafc;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.social-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.social-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    cursor: default;
+}
+
+/* Light Theme Adjustments - Mantendo box escuro para contraste igual a imagem */
+[data-theme='light'] .social-dropdown {
+    background: #1e293b;
+    /* Slate 800 */
+    border-color: #334155;
+}

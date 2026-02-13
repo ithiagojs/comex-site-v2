@@ -76,3 +76,72 @@ body {
 #root {
   min-height: 100vh;
 }
+
+/* Footer & Social Links */
+.footer {
+    margin-top: 4rem;
+    padding: 2rem;
+    text-align: center;
+    border-top: 1px solid var(--card-border);
+    animation: fadeIn 0.6s ease-out 0.8s backwards;
+}
+
+.footer-text {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+}
+
+.social-btn:hover {
+    background: #0077b5; /* LinkedIn Blue */
+    color: white;
+    border-color: #0077b5;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 119, 181, 0.3);
+}
+
+.social-btn:active {
+    transform: translateY(-1px);
+}
+
+.linkedin-icon {
+    font-size: 1.2rem;
+    display: inline-flex;
+}
+
+/* Light Mode Overrides explicitly for Social Btn */
+[data-theme='light'] .social-btn {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #475569;
+}
+
+[data-theme='light'] .social-btn:hover {
+    background: #0077b5;
+    color: white;
+    border-color: #0077b5;
+}
