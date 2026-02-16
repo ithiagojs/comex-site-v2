@@ -88,4 +88,4 @@ MIT
 
 ---
 
-Desenvolvido Thiago J. e Karina M. para otimização de processos de importação
+Desenvolvido por Karina Martins e Thiago Jacques para otimização de processos de importação
