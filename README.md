@@ -1,3 +1,4 @@
+
 # 📊 COMEX.IO — Import Hunter
 
 ## ℹ️ Contexto do Projeto
@@ -66,7 +67,7 @@ O projeto foi construído com uma arquitetura moderna dividida em:
 
 ## 🔗 Links Úteis
 
-- 💻 **Repositório Técnico (Automação)**: [Comex-io-Dashboard-Data](https://github.com/karinamsilva/Comex-io-Dashboard-Data)
+- 💻 **Comex-io-Dashboard-Data**: [Comex-io-Dashboard-Data](https://github.com/karinamsilva/Comex-io-Dashboard-Data)
 - 🌐 **Site Oficial (Deploy)**: [Comex](https://import-hunter.vercel.app/)
 - 📑 **Base de Dados (Google Sheets)**: [Acesse a planilha](https://docs.google.com/spreadsheets/d/1XmZuiNUZMyYHbPke7uMoERvs3WeGM2ayMoiSdAgiNZM/edit?usp=sharing)
 - 🗄️ **Streamlit de Referência**: [Dados Luiz Chiavini](https://comexio.streamlit.app/)
